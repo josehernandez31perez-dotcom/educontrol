@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduControl - Iniciar sesión</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="login-body">
+<div class="login-pantalla">
+    <section class="login-identidad">
+        <div class="decor decor-1" aria-hidden="true"></div>
+        <div class="decor decor-2" aria-hidden="true"></div>
+        <div class="decor decor-3" aria-hidden="true"></div>
+        <div class="linea linea-1" aria-hidden="true"></div>
+        <div class="linea linea-2" aria-hidden="true"></div>
+        <div class="login-identidad-contenido">
+            <div class="logo-circulo" aria-hidden="true">🎓</div>
+            <h2 class="identidad-titulo">EDUCONTROL</h2>
+            <p class="identidad-subtitulo">Sistema Web de Gestión Académica</p>
+            <p class="identidad-texto">Gestiona estudiantes, calificaciones y reportes académicos desde un solo lugar.</p>
+            <div class="tarjetas-decor" aria-hidden="true">
+                <div class="mini-tarjeta"><span>👨‍🎓</span> Estudiantes</div>
+                <div class="mini-tarjeta"><span>📚</span> Calificaciones</div>
+                <div class="mini-tarjeta"><span>📊</span> Reportes</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="login-acceso">
+        <div class="login-card">
+            <h1>Bienvenido a EduControl</h1>
+            <p class="login-subtitulo">Inicia sesión para continuar</p>
+
+            <div class="alerta alerta-ok" id="mensaje-login" role="status" hidden></div>
+            <div class="alerta alerta-error" id="error-login" role="alert" hidden></div>
+
+            <form class="login-form" id="form-login" novalidate>
+                <div class="campo">
+                    <label for="usuario">Usuario</label>
+                    <div class="campo-icono">
+                        <span class="icono-campo" aria-hidden="true">👤</span>
+                        <input type="text" id="usuario" name="usuario" maxlength="50" autocomplete="username" placeholder="Tu usuario" autofocus>
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="clave">Contraseña</label>
+                    <div class="campo-icono">
+                        <span class="icono-campo" aria-hidden="true">🔒</span>
+                        <input type="password" id="clave" name="clave" maxlength="255" autocomplete="current-password" placeholder="Tu contraseña">
+                    </div>
+                </div>
+                <button type="submit" class="btn-entrar">Iniciar sesión</button>
+            </form>
+
+            <p class="login-portal">Portal de gestión para docentes</p>
+            <p class="login-portal">Autenticación demostrativa: no es segura para producción.</p>
+        </div>
+        <p class="login-copy">© EduControl — Sistema Web de Gestión Académica</p>
+    </section>
+</div>
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

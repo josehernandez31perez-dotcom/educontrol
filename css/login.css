@@ -1,0 +1,358 @@
+/* css/login.css - Pantalla de acceso de EduControl (solo presentación visual) */
+
+:root {
+    --azul-oscuro: #0f2a5f;
+    --azul-institucional: #1e3a8a;
+    --azul-vivo: #2563eb;
+    --azul-claro: #dbeafe;
+    --azul-suave: #eff6ff;
+    --texto-principal: #0f2a5f;
+    --texto-secundario: #64748b;
+    --borde-campo: #cbd5e1;
+    --error-fondo: #fef2f2;
+    --error-texto: #b91c1c;
+}
+
+.login-body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    background: var(--azul-suave);
+}
+
+.login-pantalla {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+}
+
+/* ---------- Zona izquierda: identidad ---------- */
+.login-identidad {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 48px;
+    background: linear-gradient(145deg, #0f2a5f 0%, #1e3a8a 55%, #2563eb 100%);
+    color: #ffffff;
+}
+
+.decor {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    transition: transform 0.6s ease;
+}
+
+.decor-1 { width: 380px; height: 380px; top: -120px; right: -120px; }
+.decor-2 { width: 220px; height: 220px; bottom: -80px; left: -60px; background: rgba(147, 197, 253, 0.12); }
+.decor-3 { width: 90px; height: 90px; top: 18%; left: 12%; background: rgba(255, 255, 255, 0.1); }
+
+.linea {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+}
+
+.linea-1 { width: 70%; top: 22%; left: 15%; transform: rotate(-8deg); }
+.linea-2 { width: 60%; bottom: 20%; right: 5%; transform: rotate(6deg); }
+
+.login-identidad-contenido {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+}
+
+.logo-circulo {
+    width: 84px;
+    height: 84px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    margin-bottom: 22px;
+}
+
+.identidad-titulo {
+    margin: 0;
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+}
+
+.identidad-subtitulo {
+    margin: 6px 0 22px;
+    font-size: 1.1rem;
+    color: #bfdbfe;
+    font-weight: 500;
+}
+
+.identidad-texto {
+    margin: 0 0 32px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e0ecff;
+}
+
+.tarjetas-decor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.mini-tarjeta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.mini-tarjeta:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.mini-tarjeta span {
+    font-size: 1.1rem;
+}
+
+.decor:hover {
+    transform: scale(1.04);
+}
+
+/* ---------- Zona derecha: acceso ---------- */
+.login-acceso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: var(--azul-suave);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px 36px 32px;
+    box-shadow: 0 24px 60px rgba(15, 42, 95, 0.14), 0 2px 8px rgba(15, 42, 95, 0.06);
+    border: 1px solid #e2e8f0;
+    animation: aparecerTarjeta 0.6s ease both;
+}
+
+@keyframes aparecerTarjeta {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--texto-principal);
+}
+
+.login-subtitulo {
+    margin: 6px 0 24px;
+    color: var(--texto-secundario);
+    font-size: 0.95rem;
+}
+
+/* Alertas (se mantienen las clases del sistema, con estilo más discreto) */
+.login-card .alerta {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border-left: 4px solid;
+}
+
+.login-card .alerta-error {
+    background: var(--error-fondo);
+    color: var(--error-texto);
+    border-color: var(--error-texto);
+}
+
+.login-card .alerta-ok {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #16a34a;
+}
+
+/* Formulario con iconos dentro de los campos */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: none;
+}
+
+.campo-icono {
+    position: relative;
+}
+
+.campo-icono .icono-campo {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.login-form .campo label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--texto-principal);
+}
+
+.login-form .campo-icono input {
+    width: 100%;
+    padding: 12px 14px 12px 42px;
+    border: 1px solid var(--borde-campo);
+    border-radius: 10px;
+    font-size: 0.97rem;
+    font-family: inherit;
+    background: #f8fafc;
+    color: var(--texto-principal);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.login-form .campo-icono input::placeholder {
+    color: #94a3b8;
+}
+
+.login-form .campo-icono input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: var(--azul-vivo);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* Botón principal */
+.btn-entrar {
+    margin-top: 6px;
+    width: 100%;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    letter-spacing: 0.3px;
+    color: #ffffff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-entrar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.38);
+    filter: brightness(1.05);
+}
+
+.btn-entrar:active {
+    transform: translateY(0);
+}
+
+.btn-entrar:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.4);
+    outline-offset: 3px;
+}
+
+.login-portal {
+    margin: 22px 0 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--texto-secundario);
+}
+
+.login-copy {
+    margin: 26px 0 0;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* ---------- Responsive: una sola columna en celulares ---------- */
+@media (max-width: 860px) {
+    .login-pantalla {
+        grid-template-columns: 1fr;
+    }
+
+    .login-identidad {
+        padding: 32px 24px;
+    }
+
+    .login-identidad-contenido {
+        max-width: none;
+        text-align: center;
+    }
+
+    .logo-circulo {
+        margin: 0 auto 14px;
+        width: 66px;
+        height: 66px;
+        font-size: 2rem;
+    }
+
+    .identidad-titulo {
+        font-size: 2rem;
+    }
+
+    .identidad-texto,
+    .tarjetas-decor,
+    .linea {
+        display: none;
+    }
+
+    .identidad-subtitulo {
+        margin-bottom: 0;
+    }
+
+    .login-acceso {
+        padding: 28px 16px 36px;
+    }
+
+    .login-card {
+        padding: 30px 22px 26px;
+    }
+}
+
+@media (max-width: 420px) {
+    .login-card h1 {
+        font-size: 1.4rem;
+    }
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+    .login-card,
+    .decor,
+    .mini-tarjeta,
+    .btn-entrar {
+        animation: none;
+        transition: none;
+    }
+}

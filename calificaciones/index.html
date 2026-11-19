@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduControl - Calificaciones</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body data-seccion="calificaciones" >
+<script>window.EC_BASE = '../';</script>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="contenido">
+        <header class="encabezado"><h1>Calificaciones</h1></header>
+        <div id="mensajes"></div>
+        <div id="contenido-pagina"><div class="barra-superior"><p class="subtitulo-seccion" id="contador"></p><a class="btn btn-primario" data-solo-admin href="registrar.html">+ Registrar calificación</a></div><section class="panel"><h2>Ver rendimiento de un estudiante</h2><form class="selector-rendimiento" method="get" action="index.html"><select id="select-rendimiento" name="estudiante_id" required></select><button type="submit" class="btn btn-primario">Ver rendimiento</button></form><div id="rendimiento"></div></section><section class="panel"><h2>Listado de calificaciones</h2><div id="tabla-calificaciones"></div></section></div>
+    </main>
+</div>
+<script src="../js/storage.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/calificaciones.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduControl - Reportes</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body data-seccion="reportes" data-pagina="index">
+<script>window.EC_BASE = '../';</script>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="contenido">
+        <header class="encabezado"><h1>Reportes</h1></header>
+        <div id="mensajes"></div>
+        <div id="contenido-pagina"><section class="dos-columnas"><div class="panel"><h2>Reporte individual</h2><p class="vacio">Genera el informe académico de un estudiante con sus calificaciones.</p><form class="selector-rendimiento" method="get" action="individual.html"><select id="select-estudiante" name="id" required></select><button type="submit" class="btn btn-primario">Generar reporte</button></form></div><div class="panel"><h2>Reporte general</h2><p class="vacio">Resumen académico de todos los estudiantes, con ranking y totales.</p><a class="btn btn-primario" href="general.html">Generar reporte general</a></div></section><div class="acciones-form"><a class="btn btn-secundario" href="../index.html">← Volver al Dashboard</a></div></div>
+    </main>
+</div>
+<script src="../js/storage.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/reportes.js"></script>
+</body>
+</html>

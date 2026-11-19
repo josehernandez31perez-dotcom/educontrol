@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduControl - Editar calificación</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body data-seccion="calificaciones" data-rol="ADMIN" data-modo="editar">
+<script>window.EC_BASE = '../';</script>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="contenido">
+        <header class="encabezado"><h1>Editar calificación</h1></header>
+        <div id="mensajes"></div>
+        <div id="contenido-pagina"><section class="panel"><form id="form-calificacion" class="formulario" novalidate><div class="campo"><label for="estudiante_id">Estudiante *</label><select id="estudiante_id" name="estudiante_id"></select><span class="error-texto" data-error="estudiante_id"></span></div><div class="campo"><label for="materia_id">Materia *</label><select id="materia_id" name="materia_id"></select><span class="error-texto" data-error="materia_id"></span></div><div class="campo"><label for="nota">Nota * <small>(entre 1.0 y 5.0)</small></label><input type="number" id="nota" name="nota" min="1" max="5" step="0.1"><span class="error-texto" data-error="nota"></span></div><div class="acciones-form"><button type="submit" class="btn btn-primario">Guardar cambios</button><a class="btn btn-secundario" href="index.html">Cancelar</a></div></form></section></div>
+    </main>
+</div>
+<script src="../js/storage.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/calificaciones-form.js"></script>
+</body>
+</html>
