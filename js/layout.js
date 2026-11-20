@@ -11,7 +11,7 @@
     var MENU = [
         { texto: 'Dashboard', icono: '🏠', ruta: 'index.html', seccion: 'dashboard' },
         { texto: 'Estudiantes', icono: '👨‍🎓', ruta: 'estudiantes/index.html', seccion: 'estudiantes' },
-        { texto: 'Calificaciones', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'calificaciones' },
+        { texto: 'notas', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'calificaciones' },
         { texto: 'Estadísticas', icono: '📊', ruta: 'estadisticas/index.html', seccion: 'estadisticas' },
         { texto: 'Reportes', icono: '📄', ruta: 'reportes/index.html', seccion: 'reportes' }
     ];
