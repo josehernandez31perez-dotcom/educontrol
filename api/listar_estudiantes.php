@@ -1,7 +1,7 @@
 <?php
 require_once "conexion.php";
 
-$sql = "SELECT id, cedula, nombre, apellido, estado
+$sql = "SELECT id, cedula, nombre, apellido, estado, fecha_registro
         FROM estudiantes";
 
 $consulta = $conexion->query($sql);
