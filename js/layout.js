@@ -9,7 +9,7 @@
     var permitido = false;
 
     var MENU = [
-        { texto: 'Dashboard', icono: '🏠', ruta: 'index.html', seccion: 'dashboard' },
+        { texto: 'pagina principal', icono: '🏠', ruta: 'index.html', seccion: 'pagina principal' },
         { texto: 'Estudiantes', icono: '👨‍🎓', ruta: 'estudiantes/index.html', seccion: 'estudiantes' },
         { texto: 'Calificaciones', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'calificaciones' },
         { texto: 'Estadísticas', icono: '📊', ruta: 'estadisticas/index.html', seccion: 'estadisticas' },
