@@ -795,3 +795,19 @@ button.menu-link {
 .tabla .acciones {
     white-space: nowrap;
 }
+
+/* ---------- Respaldo de datos ---------- */
+.lista-errores {
+    margin: 0 0 16px;
+    padding: 12px 12px 12px 30px;
+    background: #fef2f2;
+    border-left: 4px solid #b91c1c;
+    border-radius: 8px;
+    color: #991b1b;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* ---------- Estados de estudiante ---------- */
+.badge-retirado { background: #f1f5f9; color: #475569; }
+.badge-graduado { background: #dbeafe; color: #1e40af; }

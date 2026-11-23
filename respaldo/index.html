@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduControl - Respaldo de datos</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body data-seccion="respaldo" data-rol="ADMIN">
+<script>window.EC_BASE = '../';</script>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="contenido">
+        <header class="encabezado"><h1>Respaldo de datos</h1></header>
+        <div id="mensajes"></div>
+        <div id="contenido-pagina">
+            <section class="dos-columnas">
+                <div class="panel">
+                    <h2>Exportar respaldo</h2>
+                    <p class="vacio">Descarga un archivo JSON con estudiantes, materias y calificaciones (formato versión 2).</p>
+                    <p class="vacio">El archivo no incluye usuarios ni contraseñas. Al importarlo, los usuarios actuales se conservan.</p>
+                    <div class="acciones-form">
+                        <button type="button" class="btn btn-primario" id="btn-exportar">💾 Exportar respaldo</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Importar respaldo</h2>
+                    <p class="vacio">Reemplaza los datos actuales por los del archivo. Antes de hacerlo se pedirá confirmación.</p>
+                    <div class="campo">
+                        <label for="input-respaldo">Archivo de respaldo (.json)</label>
+                        <input type="file" id="input-respaldo" accept=".json,application/json">
+                    </div>
+                    <p class="vacio" id="info-archivo">Ningún archivo seleccionado.</p>
+                    <ul class="lista-errores" id="lista-errores" hidden></ul>
+                    <div class="acciones-form">
+                        <button type="button" class="btn btn-peligro" id="btn-importar" disabled>📥 Importar respaldo</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>Cómo funciona</h2>
+                <ul class="lista-sencilla">
+                    <li>Esta sección es exclusiva del administrador. Otros roles no pueden acceder a ella ni exportar datos.</li>
+                    <li>El archivo versión 2 no contiene usuarios ni contraseñas. Si se importa un archivo sin usuarios, los usuarios actuales se conservan.</li>
+                    <li>Los archivos de versión 1 siguen siendo importables. Si incluyen usuarios, estos reemplazan a los actuales.</li>
+                    <li>El archivo se revisa completo antes de cambiar nada. Si tiene errores, se muestra la lista de problemas y los datos actuales no se tocan.</li>
+                    <li>Antes de reemplazar los datos se pide confirmación, con las cantidades actuales y las del archivo.</li>
+                    <li>Si el navegador rechaza la escritura, se restauran los datos anteriores automáticamente.</li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</div>
+<script src="../js/storage.js"></script>
+<script src="../js/configuracion.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/respaldo.js"></script>
+</body>
+</html>

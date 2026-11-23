@@ -11,7 +11,7 @@
         var posicion = 0;
         est.ranking.concat(est.sinNotasLista).forEach(function (fila) {
             var tieneNotas = fila.promedio !== null;
-            var porcentaje = tieneNotas ? Math.min(100, Math.round(fila.promedio / 5 * 100)) : 0;
+            var porcentaje = tieneNotas ? Math.min(100, Math.round(fila.promedio / EC.configuracion.obtener().notaMaxima * 100)) : 0;
             if (tieneNotas) { posicion++; }
             filas += '<tr><td>' + (tieneNotas ? posicion : '—') + '</td>' +
                 '<td>' + EC.esc(fila.nombre + ' ' + fila.apellido) + '</td>' +

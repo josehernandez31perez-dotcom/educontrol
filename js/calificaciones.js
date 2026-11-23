@@ -48,7 +48,7 @@
                         '" data-texto="' + EC.esc(c.materia + ' de ' + c.nombre + ' ' + c.apellido) + '">Eliminar</button>';
                 }
                 return '<tr><td>' + EC.esc(c.apellido + ' ' + c.nombre) + '</td><td>' + EC.esc(c.cedula) + '</td><td>' +
-                    EC.esc(c.materia) + '</td><td><span class="nota ' + (c.nota >= 3 ? 'nota-aprobada' : 'nota-reprobada') + '">' +
+                    EC.esc(c.materia) + '</td><td><span class="nota ' + (EC.configuracion.aprueba(c.nota) ? 'nota-aprobada' : 'nota-reprobada') + '">' +
                     EC.formato.nota(c.nota) + '</span></td><td>' + EC.fecha(c.fecha_registro) + '</td><td class="acciones">' +
                     acciones + '</td></tr>';
             }).join('');

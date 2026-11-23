@@ -22,7 +22,7 @@
             ? '<div class="tabla-contenedor"><table class="tabla"><thead><tr><th>Materia</th><th>Nota</th></tr></thead><tbody>' +
               notas.map(function (n) {
                   return '<tr><td>' + EC.esc(n.materia) + '</td><td><span class="nota ' +
-                      (n.nota >= 3 ? 'nota-aprobada' : 'nota-reprobada') + '">' + EC.formato.nota(n.nota) + '</span></td></tr>';
+                      (EC.configuracion.aprueba(n.nota) ? 'nota-aprobada' : 'nota-reprobada') + '">' + EC.formato.nota(n.nota) + '</span></td></tr>';
               }).join('') + '</tbody></table></div>'
             : '<p class="vacio">Sin calificaciones registradas</p>';
 

@@ -16,6 +16,9 @@
     // Si cambias los datos iniciales, sube este número para volver a cargarlos.
     var VERSION_DATOS = '1';
 
+    // Nombres de las claves de localStorage (los usa el módulo de respaldo)
+    EC.claves = CLAVES;
+
     function leer(clave) {
         try {
             var valor = JSON.parse(global.localStorage.getItem(clave));
@@ -68,6 +71,9 @@
             .replace(/'/g, '&#39;');
     };
 
+    // Búsqueda sin tildes ni mayúsculas (la usan estudiantes y estadísticas)
+    EC.normalizarTexto = normalizar;
+
     // Carga los datos de prueba del proyecto (Carlos Gómez NO se incluye)
     EC.inicializarDatos = function () {
         if (global.localStorage.getItem(CLAVES.version) === VERSION_DATOS) { return; }
@@ -117,6 +123,14 @@
 
     // ---------- Estudiantes ----------
     EC.estudiantes = {
+        ESTADOS: ['ACTIVO', 'INACTIVO', 'RETIRADO', 'GRADUADO'],
+
+        // Clase CSS de la insignia de cada estado
+        claseInsignia: function (estado) {
+            var clases = { ACTIVO: 'badge-activo', INACTIVO: 'badge-inactivo', RETIRADO: 'badge-retirado', GRADUADO: 'badge-graduado' };
+            return clases[estado] || 'badge-inactivo';
+        },
+
         listar: function () {
             return leer(CLAVES.estudiantes).slice().sort(compararNombre);
         },
@@ -175,7 +189,7 @@
                 errores.apellido = 'El apellido no puede tener más de 60 caracteres.';
             }
 
-            if (['ACTIVO', 'INACTIVO'].indexOf(limpio.estado) === -1) {
+            if (EC.estudiantes.ESTADOS.indexOf(limpio.estado) === -1) {
                 errores.estado = 'El estado seleccionado no es válido.';
             }
 
@@ -291,8 +305,9 @@
                 errores.nota = 'La nota es obligatoria.';
             } else if (!/^\d(\.\d)?$/.test(limpio.nota)) {
                 errores.nota = 'Escribe la nota con un solo decimal, por ejemplo 3.5.';
-            } else if (Number(limpio.nota) < 1 || Number(limpio.nota) > 5) {
-                errores.nota = 'La nota debe estar entre 1.0 y 5.0.';
+            } else if (!EC.configuracion.notaEnRango(Number(limpio.nota))) {
+                var rango = EC.configuracion.obtener();
+                errores.nota = 'La nota debe estar entre ' + rango.notaMinima.toFixed(1) + ' y ' + rango.notaMaxima.toFixed(1) + '.';
             }
 
             if (!errores.estudiante_id && !errores.materia_id) {
@@ -358,10 +373,10 @@
             return redondear(suma / notas.length);
         },
 
-        // Regla: promedio >= 3.0 APROBADO; < 3.0 REPROBADO; sin notas SIN NOTAS
+        // Regla: promedio >= nota de aprobación APROBADO; si no, REPROBADO; sin notas SIN NOTAS
         estadoAcademico: function (promedio) {
             if (promedio === null || promedio === undefined) { return 'SIN NOTAS'; }
-            return promedio >= 3 ? 'APROBADO' : 'REPROBADO';
+            return EC.configuracion.aprueba(promedio) ? 'APROBADO' : 'REPROBADO';
         },
 
         // Equivale a la vista v_resumen_estudiantes (incluye a todos los estudiantes)
@@ -389,6 +404,17 @@
         notasDeEstudiante: function (id) {
             return EC.calificaciones.listarDetalle().filter(function (c) {
                 return c.estudiante_id === Number(id);
+            });
+        },
+
+        // Búsqueda por cédula, nombre o apellido, sin distinguir mayúsculas ni tildes
+        buscar: function (termino) {
+            var t = normalizar(termino).trim();
+            if (!t) { return EC.calculos.resumen(); }
+            return EC.calculos.resumen().filter(function (r) {
+                return normalizar(r.cedula).indexOf(t) !== -1 ||
+                       normalizar(r.nombre).indexOf(t) !== -1 ||
+                       normalizar(r.apellido).indexOf(t) !== -1;
             });
         },
 

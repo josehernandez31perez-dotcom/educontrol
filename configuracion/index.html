@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduControl - Configuración académica</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body data-seccion="configuracion" data-rol="ADMIN">
+<script>window.EC_BASE = '../';</script>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="contenido">
+        <header class="encabezado"><h1>Configuración académica</h1></header>
+        <div id="mensajes"></div>
+        <div id="contenido-pagina">
+            <section class="panel">
+                <h2>Escala de notas y aprobación</h2>
+                <p class="vacio">Valores iniciales: escala de 1.0 a 5.0 y aprobación desde 3.0. Cada nota se escribe con un solo decimal.</p>
+                <p class="vacio"><strong>Importante:</strong> los cambios se aplican de inmediato a todas las notas y estados existentes, porque todavía no hay configuración por año escolar.</p>
+                <form id="form-configuracion" class="formulario" novalidate>
+                    <div class="campo">
+                        <label for="notaMinima">Nota mínima de la escala</label>
+                        <input type="number" id="notaMinima" name="notaMinima" step="0.1" min="0.1">
+                    </div>
+                    <div class="campo">
+                        <label for="notaMaxima">Nota máxima de la escala</label>
+                        <input type="number" id="notaMaxima" name="notaMaxima" step="0.1" min="0.2">
+                    </div>
+                    <div class="campo">
+                        <label for="notaAprobacion">Nota mínima para aprobar</label>
+                        <input type="number" id="notaAprobacion" name="notaAprobacion" step="0.1" min="0.1">
+                        <span class="error-texto" data-error="general"></span>
+                    </div>
+                    <div class="acciones-form">
+                        <button type="submit" class="btn btn-primario">Guardar configuración</button>
+                        <button type="button" class="btn btn-secundario" id="btn-restablecer">Restablecer valores iniciales</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</div>
+<script src="../js/storage.js"></script>
+<script src="../js/configuracion.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/configuracion-form.js"></script>
+</body>
+</html>

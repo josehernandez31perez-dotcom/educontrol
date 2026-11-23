@@ -39,6 +39,10 @@
                     EC.esc(m.nombre) + '</option>';
             }).join('');
 
+        var rango = EC.configuracion.obtener();
+        form.elements.nota.min = rango.notaMinima;
+        form.elements.nota.max = rango.notaMaxima;
+
         if (actual) {
             form.elements.nota.value = EC.formato.nota(actual.nota);
         }

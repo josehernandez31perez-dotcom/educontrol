@@ -9,11 +9,13 @@
     var permitido = false;
 
     var MENU = [
-        { texto: 'pagina principal', icono: '🏠', ruta: 'index.html', seccion: 'dashboard' },
+        { texto: 'Dashboard', icono: '🏠', ruta: 'index.html', seccion: 'dashboard' },
         { texto: 'Estudiantes', icono: '👨‍🎓', ruta: 'estudiantes/index.html', seccion: 'estudiantes' },
-        { texto: 'notas', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'calificaciones' },
+        { texto: 'Calificaciones', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'calificaciones' },
         { texto: 'Estadísticas', icono: '📊', ruta: 'estadisticas/index.html', seccion: 'estadisticas' },
-        { texto: 'Reportes', icono: '📄', ruta: 'reportes/index.html', seccion: 'reportes' }
+        { texto: 'Reportes', icono: '📄', ruta: 'reportes/index.html', seccion: 'reportes' },
+        { texto: 'Respaldo', icono: '💾', ruta: 'respaldo/index.html', seccion: 'respaldo' },
+        { texto: 'Configuración', icono: '⚙️', ruta: 'configuracion/index.html', seccion: 'configuracion' }
     ];
 
     // Las páginas ejecutan su código solo cuando la sesión y el rol son válidos
@@ -66,7 +68,7 @@
     };
 
     EC.badgeActivo = function (estado) {
-        return '<span class="badge ' + (estado === 'ACTIVO' ? 'badge-activo' : 'badge-inactivo') + '">' + EC.esc(estado) + '</span>';
+        return '<span class="badge ' + EC.estudiantes.claseInsignia(estado) + '">' + EC.esc(estado) + '</span>';
     };
 
     function renderizarMenu(sesion) {

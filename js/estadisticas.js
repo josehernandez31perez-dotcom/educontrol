@@ -65,12 +65,7 @@
             var termino = buscador.value.trim();
             if (!termino) { resultado.innerHTML = ''; return; }
 
-            var coincidencias = EC.calculos.resumen().filter(function (r) {
-                var t = termino.toLowerCase();
-                return r.cedula.toLowerCase().indexOf(t) !== -1 ||
-                       r.nombre.toLowerCase().indexOf(t) !== -1 ||
-                       r.apellido.toLowerCase().indexOf(t) !== -1;
-            });
+            var coincidencias = EC.calculos.buscar(termino);
 
             if (!coincidencias.length) {
                 resultado.innerHTML = '<p class="vacio">No se encontraron estudiantes para «' + EC.esc(termino) + '».</p>';
