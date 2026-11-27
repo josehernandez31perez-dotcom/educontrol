@@ -1,5 +1,5 @@
 
-/* js/estudiantes.js - Listado de estudiantes */
+/* js/estudiantes.js - Listado y acciones de estudiantes */
 (function () {
     'use strict';
 
@@ -21,6 +21,7 @@
         var cargando = true;
         var errorCarga = false;
         var textoError = '';
+        var eliminando = false;
 
         function filtrar(termino) {
             var t = EC.normalizarTexto(termino).trim();
@@ -77,7 +78,7 @@
                         ' <button type="button" class="btn btn-pequeno btn-secundario btn-editar" data-id="' +
                         e.id + '">Editar</button>' +
                         ' <button type="button" class="btn btn-pequeno btn-peligro btn-eliminar" data-id="' +
-                        e.id + '">Eliminar</button>';
+                        e.id + '"' + (eliminando ? ' disabled' : '') + '>Eliminar</button>';
                 }
 
                 return '<tr>' +
@@ -130,6 +131,79 @@
             });
         }
 
+        function eliminarEstudiante(id) {
+            if (eliminando) {
+                return;
+            }
+
+            var estudiante = estudiantes.find(function (e) {
+                return e.id === id;
+            });
+
+            if (!estudiante) {
+                EC.mostrarMensaje('error', 'No se encontró el estudiante seleccionado.');
+                return;
+            }
+
+            var nombreCompleto = estudiante.nombre + ' ' + estudiante.apellido;
+
+            var confirmar = window.confirm(
+                '¿Estás seguro de que deseas eliminar a ' +
+                nombreCompleto + ' (cédula: ' + estudiante.cedula + ')?\n\n' +
+                'Si tiene calificaciones registradas, el sistema impedirá la eliminación.'
+            );
+
+            if (!confirmar) {
+                return;
+            }
+
+            eliminando = true;
+            pintar();
+
+            EC.auth.obtenerCsrf()
+                .then(function (token) {
+                    return fetch(
+                        (window.EC_BASE || '') + 'api/eliminar_estudiante.php',
+                        {
+                            method: 'POST',
+                            cache: 'no-store',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-Token': token
+                            },
+                            body: JSON.stringify({ id: id })
+                        }
+                    );
+                })
+                .then(function (respuesta) {
+                    return respuesta.json().then(function (datos) {
+                        if (!respuesta.ok || !datos.ok) {
+                            throw new Error(
+                                datos.mensaje || 'No fue posible eliminar el estudiante.'
+                            );
+                        }
+
+                        return datos;
+                    });
+                })
+                .then(function (datos) {
+                    EC.mostrarMensaje('exito', datos.mensaje);
+                    return cargarEstudiantes();
+                })
+                .catch(function (error) {
+                    EC.mostrarMensaje(
+                        'error',
+                        error.message || 'Ocurrió un error al eliminar el estudiante.'
+                    );
+                })
+                .then(function () {
+                    eliminando = false;
+                    pintar();
+                });
+        }
+
         buscador.addEventListener('input', pintar);
 
         zona.addEventListener('click', function (evento) {
@@ -163,7 +237,11 @@
             var botonEliminar = evento.target.closest('.btn-eliminar');
 
             if (botonEliminar) {
-                EC.mostrarMensaje('info', mensajePendiente());
+                var idEliminar = Number(botonEliminar.dataset.id);
+
+                if (idEliminar > 0) {
+                    eliminarEstudiante(idEliminar);
+                }
             }
         });
 
