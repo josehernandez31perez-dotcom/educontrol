@@ -1,5 +1,5 @@
 
-/* js/layout.js - Menú, sesión, permisos por rol, mensajes e impresión comunes a todas las páginas */
+/* js/layout.js - Menú, sesión, permisos, mensajes e impresión */
 (function (global) {
     'use strict';
 
@@ -19,7 +19,6 @@
         { texto: 'Configuración', icono: '⚙️', ruta: 'configuracion/index.html', seccion: 'configuracion' }
     ];
 
-    // Las páginas ejecutan su código solo cuando la sesión y el rol son válidos
     EC.alCargar = function (fn) {
         if (listo) {
             if (permitido) {
@@ -30,12 +29,10 @@
         }
     };
 
-    // Navega a una ruta relativa a la raíz del proyecto
     EC.irA = function (ruta) {
         global.location.href = (global.EC_BASE || '') + ruta;
     };
 
-    // Guarda un mensaje para mostrarlo en la página siguiente
     EC.guardarFlash = function (tipo, texto) {
         global.sessionStorage.setItem(
             CLAVE_FLASH,
@@ -178,7 +175,6 @@
         var body = document.body;
         var base = global.EC_BASE || '';
 
-        // La sesión la confirma el servidor antes de mostrar la página
         EC.auth.cargarSesion().then(function (sesion) {
             listo = true;
 
@@ -189,7 +185,6 @@
 
             renderizarMenu(sesion);
 
-            // Aviso según la operación disponible en MySQL
             if (EC.fuente === 'mysql') {
                 if (
                     body.dataset.seccion === 'estudiantes' &&
@@ -199,6 +194,14 @@
                         'info',
                         'Estás editando un estudiante almacenado en MySQL.'
                     );
+                } else if (
+                    body.dataset.seccion === 'calificaciones' &&
+                    body.dataset.modo === 'editar'
+                ) {
+                    EC.mostrarMensaje(
+                        'info',
+                        'Estás editando una calificación almacenada en MySQL.'
+                    );
                 } else {
                     EC.mostrarMensaje(
                         'info',
@@ -207,7 +210,6 @@
                 }
             }
 
-            // Página que requiere un rol concreto
             var rolRequerido = body.dataset.rol;
 
             if (rolRequerido && rolRequerido !== sesion.rol) {
@@ -225,29 +227,30 @@
                 return;
             }
 
-            // Permitir la edición de estudiantes conectada a MySQL.
-            // Las demás páginas de escritura siguen bloqueadas.
-            // Permitir el registro y edición de estudiantes y el registro de calificaciones.
             var esEdicionEstudiante =
-            body.dataset.seccion === 'estudiantes' &&
-            body.dataset.modo === 'editar';
+                body.dataset.seccion === 'estudiantes' &&
+                body.dataset.modo === 'editar';
 
             var esRegistroEstudiante =
-            body.dataset.seccion === 'estudiantes' &&
-            body.dataset.modo === 'registrar';
+                body.dataset.seccion === 'estudiantes' &&
+                body.dataset.modo === 'registrar';
 
             var esRegistroCalificacion =
-            body.dataset.seccion === 'calificaciones' &&
-            body.dataset.modo === 'registrar';
+                body.dataset.seccion === 'calificaciones' &&
+                body.dataset.modo === 'registrar';
+
+            var esEdicionCalificacion =
+                body.dataset.seccion === 'calificaciones' &&
+                body.dataset.modo === 'editar';
 
             if (
                 EC.fuente === 'mysql' &&
                 body.dataset.escritura === 'true' &&
                 !esEdicionEstudiante &&
                 !esRegistroEstudiante &&
-                !esRegistroCalificacion
+                !esRegistroCalificacion &&
+                !esEdicionCalificacion
             ) {
-
                 var zonaBloqueada = document.getElementById('contenido-pagina');
 
                 if (zonaBloqueada) {
@@ -262,7 +265,6 @@
                 return;
             }
 
-            // Ocultar acciones de modificación a quien no es ADMIN
             if (sesion.rol !== 'ADMIN') {
                 document.querySelectorAll('[data-solo-admin]').forEach(function (el) {
                     el.parentNode.removeChild(el);
@@ -287,7 +289,6 @@
         });
     }
 
-    // Botón de impresión
     document.addEventListener('click', function (evento) {
         if (
             evento.target.closest &&
