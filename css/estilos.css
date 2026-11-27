@@ -274,8 +274,8 @@ body {
 
 .btn-primario   { background: var(--verde-claro); color: var(--amarillo); }
 .btn-primario:hover { background: var(--azul); }
-.btn-secundario { background: #e2e8f0; color: var(--texto); }
-.btn-secundario:hover { background: #cbd5e1; }
+.btn-secundario { background: #3c79ca; color: var(--texto); }
+.btn-secundario:hover { background: #39a670; }
 .btn-peligro    { background: var(--rojo); color: var(--blanco); }
 .btn-peligro:hover { background: #b91c1c; }
 .btn-pequeno    { padding: 6px 10px; font-size: 0.8rem; }
