@@ -1,7 +1,7 @@
 /* css/estilos.css - Estilos generales de EduControl */
 
 :root {
-    --azul: #1e3a8a;
+    --azul: #dfe66b;
     --azul-claro: #3b82f6;
     --fondo: #f1f5f9;
     --blanco: #ffffff;
@@ -272,7 +272,7 @@ body {
     white-space: nowrap;
 }
 
-.btn-primario   { background: var(--azul-claro); color: var(--blanco); }
+.btn-primario   { background: var(--verde-claro); color: var(--amarillo); }
 .btn-primario:hover { background: var(--azul); }
 .btn-secundario { background: #e2e8f0; color: var(--texto); }
 .btn-secundario:hover { background: #cbd5e1; }
