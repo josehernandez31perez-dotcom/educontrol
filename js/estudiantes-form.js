@@ -20,7 +20,7 @@
         });
     }
 
-    function registrarEnMySQL(form, valores) {
+    function enviarMySQL(form, valores, archivo, mensajeError) {
         var boton = form.querySelector('button[type="submit"]');
 
         boton.disabled = true;
@@ -32,7 +32,7 @@
                     throw new Error('No se pudo obtener el token de seguridad.');
                 }
 
-                return fetch((window.EC_BASE || '') + 'api/registrar_estudiante.php', {
+                return fetch((window.EC_BASE || '') + 'api/' + archivo, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@
                     mostrarErrores(form, datos.errores || {});
                     EC.mostrarMensaje(
                         'error',
-                        datos.mensaje || 'No fue posible registrar el estudiante.'
+                        datos.mensaje || mensajeError
                     );
                     boton.disabled = false;
                     return;
@@ -67,7 +67,7 @@
                 EC.irA('estudiantes/index.html');
             })
             .catch(function (error) {
-                console.error('Error al registrar estudiante:', error);
+                console.error('Error al guardar estudiante:', error);
 
                 EC.mostrarMensaje(
                     'error',
@@ -75,6 +75,31 @@
                 );
 
                 boton.disabled = false;
+            });
+    }
+
+    function cargarEstudiante(form, id) {
+        form.hidden = true;
+
+        EC.datos.estudiantePorId(id)
+            .then(function (actual) {
+                if (!actual) {
+                    throw new Error('No se encontró el estudiante solicitado.');
+                }
+
+                form.elements.cedula.value = actual.cedula;
+                form.elements.nombre.value = actual.nombre;
+                form.elements.apellido.value = actual.apellido;
+                form.elements.estado.value = actual.estado;
+
+                form.hidden = false;
+            })
+            .catch(function (error) {
+                console.error('Error al cargar estudiante:', error);
+                EC.mostrarMensaje(
+                    'error',
+                    'No se pudo cargar el estudiante desde MySQL.'
+                );
             });
     }
 
@@ -88,18 +113,13 @@
         }
 
         if (modo === 'editar') {
-            var actual = EC.estudiantes.obtener(id);
-
-            if (!actual) {
-                EC.mostrarMensaje('error', 'No se encontró el estudiante solicitado.');
+            if (!id) {
+                EC.mostrarMensaje('error', 'El identificador del estudiante no es válido.');
                 form.hidden = true;
                 return;
             }
 
-            form.elements.cedula.value = actual.cedula;
-            form.elements.nombre.value = actual.nombre;
-            form.elements.apellido.value = actual.apellido;
-            form.elements.estado.value = actual.estado;
+            cargarEstudiante(form, id);
         }
 
         form.addEventListener('submit', function (evento) {
@@ -107,23 +127,26 @@
 
             var valores = leerFormulario(form);
 
-            // El registro nuevo se guarda directamente en MySQL.
             if (modo === 'registrar') {
-                registrarEnMySQL(form, valores);
+                enviarMySQL(
+                    form,
+                    valores,
+                    'registrar_estudiante.php',
+                    'No fue posible registrar el estudiante.'
+                );
                 return;
             }
 
-            // La edición conserva por ahora su funcionamiento anterior.
-            var resultado = EC.estudiantes.actualizar(id, valores);
+            if (modo === 'editar') {
+                valores.id = id;
 
-            if (!resultado.ok) {
-                mostrarErrores(form, resultado.errores);
-                EC.mostrarMensaje('error', 'Revisa los campos marcados en rojo.');
-                return;
+                enviarMySQL(
+                    form,
+                    valores,
+                    'actualizar_estudiante.php',
+                    'No fue posible actualizar el estudiante.'
+                );
             }
-
-            EC.guardarFlash('ok', 'Los datos del estudiante se guardaron correctamente.');
-            EC.irA('estudiantes/index.html');
         });
     });
 })();
