@@ -48,7 +48,8 @@
                 '<tr><th>Cédula</th><td>' + escapar(estudiante.cedula) + '</td></tr>' +
                 '<tr><th>Nombre</th><td>' + escapar(estudiante.nombre) + '</td></tr>' +
                 '<tr><th>Apellido</th><td>' + escapar(estudiante.apellido) + '</td></tr>' +
-                '<tr><th>Fecha de registro</th><td>' + escapar(EC.fecha(estudiante.fecha_registro)) + '</td></tr>' +
+                '<tr><th>Fecha de ingreso</th><td>' + escapar(EC.fecha(estudiante.fecha_registro)) + '</td></tr>' +
+                '<tr><th>Año de ingreso</th><td>' + escapar(EC.anioIngreso(estudiante.fecha_registro)) + '</td></tr>' +
                 '<tr><th>Estado</th><td>' + escapar(estudiante.estado) + '</td></tr>' +
                 '</tbody></table></div>' +
 

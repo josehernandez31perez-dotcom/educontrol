@@ -87,6 +87,7 @@
                     '<td>' + EC.esc(e.nombre) + '</td>' +
                     '<td>' + EC.esc(e.apellido) + '</td>' +
                     '<td>' + EC.fecha(e.fecha_registro) + '</td>' +
+                    '<td>' + EC.anioIngreso(e.fecha_registro) + '</td>' +
                     '<td>' + EC.badgeActivo(e.estado) + '</td>' +
                     '<td class="acciones">' + acciones + '</td>' +
                     '</tr>';
@@ -100,7 +101,8 @@
                 '<th>Cédula</th>' +
                 '<th>Nombre</th>' +
                 '<th>Apellido</th>' +
-                '<th>Fecha de registro</th>' +
+                '<th>Fecha de ingreso</th>' +
+                '<th>Año de ingreso</th>' +
                 '<th>Estado</th>' +
                 '<th>Acciones</th>' +
                 '</tr></thead>' +

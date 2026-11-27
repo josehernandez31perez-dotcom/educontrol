@@ -9,6 +9,7 @@ $sql = "SELECT
             m.nombre AS materia,
             c.nota,
             c.fecha_registro,
+            e.fecha_registro AS fecha_ingreso,
             c.estudiante_id,
             c.materia_id,
             e.cedula,

@@ -31,13 +31,16 @@
                 }).join('');
         }
 
-        function pintarRendimiento(r) {
+        function pintarRendimiento(r, estudiantes) {
             if (!seleccionado) {
                 return;
             }
 
+            var estudianteSeleccionado = (estudiantes || []).find(function (e) { return e.id === seleccionado; });
             zonaRendimiento.innerHTML = r
                 ? '<div class="resumen-grid">' +
+                    '<div class="resumen-item"><span class="stat-etiqueta">Año de ingreso</span><strong>' +
+                    EC.anioIngreso(estudianteSeleccionado && estudianteSeleccionado.fecha_registro) + '</strong></div>' +
                     '<div class="resumen-item"><span class="stat-etiqueta">Nombre completo</span><strong>' +
                     EC.esc(r.nombre + ' ' + r.apellido) + '</strong></div>' +
                     '<div class="resumen-item"><span class="stat-etiqueta">Cantidad de materias</span><strong>' +
@@ -136,6 +139,7 @@
                 return '<tr>' +
                     '<td>' + EC.esc(c.apellido + ' ' + c.nombre) + '</td>' +
                     '<td>' + EC.esc(c.cedula) + '</td>' +
+                    '<td>' + EC.anioIngreso(c.fecha_ingreso) + '</td>' +
                     '<td>' + EC.esc(c.materia) + '</td>' +
                     '<td><span class="nota ' +
                     (EC.configuracion.aprueba(c.nota) ? 'nota-aprobada' : 'nota-reprobada') +
@@ -149,8 +153,8 @@
                 '<div class="tabla-contenedor">' +
                 '<table class="tabla">' +
                 '<thead><tr>' +
-                '<th>Estudiante</th><th>Cédula</th><th>Materia</th>' +
-                '<th>Nota</th><th>Fecha</th><th>Acciones</th>' +
+                '<th>Estudiante</th><th>Cédula</th><th>Año de ingreso</th><th>Materia</th>' +
+                '<th>Nota</th><th>Fecha de la nota</th><th>Acciones</th>' +
                 '</tr></thead>' +
                 '<tbody>' + filas + '</tbody>' +
                 '</table></div>';
@@ -179,7 +183,7 @@
             nuevaFila.className = 'fila-detalle';
 
             var celda = document.createElement('td');
-            celda.colSpan = 6;
+            celda.colSpan = 7;
 
             celda.innerHTML =
                 '<strong>Detalles de la calificación</strong>' +
@@ -187,6 +191,8 @@
                 '<p><strong>Estudiante:</strong> ' +
                 EC.esc(calificacion.nombre + ' ' + calificacion.apellido) + '</p>' +
                 '<p><strong>Cédula:</strong> ' + EC.esc(calificacion.cedula) + '</p>' +
+                '<p><strong>Fecha de ingreso:</strong> ' + EC.esc(EC.fecha(calificacion.fecha_ingreso)) + '</p>' +
+                '<p><strong>Año de ingreso:</strong> ' + EC.esc(EC.anioIngreso(calificacion.fecha_ingreso)) + '</p>' +
                 '<p><strong>Materia:</strong> ' + EC.esc(calificacion.materia) + '</p>' +
                 '<p><strong>Nota:</strong> ' +
                 EC.esc(EC.formato.nota(calificacion.nota)) + '</p>' +
@@ -209,7 +215,7 @@
                 ]);
             }, function (datos) {
                 pintarSelector(datos[0]);
-                pintarRendimiento(datos[2]);
+                pintarRendimiento(datos[2], datos[0]);
                 pintarTabla(datos[1]);
             });
         }

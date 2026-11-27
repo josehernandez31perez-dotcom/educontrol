@@ -40,7 +40,8 @@
                 '<div class="resumen-item"><span class="stat-etiqueta">Cédula</span><strong>' + EC.esc(est.cedula) + '</strong></div>' +
                 '<div class="resumen-item"><span class="stat-etiqueta">Nombre completo</span><strong>' + EC.esc(est.nombre + ' ' + est.apellido) + '</strong></div>' +
                 '<div class="resumen-item"><span class="stat-etiqueta">Estado</span>' + EC.badgeActivo(est.estado) + '</div>' +
-                '<div class="resumen-item"><span class="stat-etiqueta">Fecha de registro</span><strong>' + EC.fecha(est.fecha_registro, true) + '</strong></div>' +
+                '<div class="resumen-item"><span class="stat-etiqueta">Fecha de ingreso</span><strong>' + EC.fecha(est.fecha_registro, true) + '</strong></div>' +
+                '<div class="resumen-item"><span class="stat-etiqueta">Año de ingreso</span><strong>' + EC.anioIngreso(est.fecha_registro) + '</strong></div>' +
                 '</div></section>' +
                 '<section class="panel"><h2>Rendimiento académico</h2><div class="resumen-grid">' +
                 '<div class="resumen-item"><span class="stat-etiqueta">Materias cursadas</span><strong>' + notas.length + '</strong></div>' +

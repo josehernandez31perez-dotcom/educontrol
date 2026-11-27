@@ -10,13 +10,13 @@
     var permitido = false;
 
     var MENU = [
-        { texto: 'Página Principal', icono: '🏠', ruta: 'index.html', seccion: 'Página Principal' },
-        { texto: 'Estudiantes', icono: '👨‍🎓', ruta: 'estudiantes/index.html', seccion: 'Estudiantes' },
-        { texto: 'Calificaciones', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'Calificaciones' },
-        { texto: 'Estadísticas', icono: '📊', ruta: 'estadisticas/index.html', seccion: 'Estadísticas' },
-        { texto: 'Reportes', icono: '📄', ruta: 'reportes/index.html', seccion: 'Reportes' },
-        { texto: 'Respaldo', icono: '💾', ruta: 'respaldo/index.html', seccion: 'Respaldo' },
-        { texto: 'Configuración', icono: '⚙️', ruta: 'configuracion/index.html', seccion: 'Configuración' }
+        { texto: 'pagina principal', icono: '🏠', ruta: 'index.html', seccion: 'pagina principal' },
+        { texto: 'Estudiantes', icono: '👨‍🎓', ruta: 'estudiantes/index.html', seccion: 'estudiantes' },
+        { texto: 'Calificaciones', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'calificaciones' },
+        { texto: 'Estadísticas', icono: '📊', ruta: 'estadisticas/index.html', seccion: 'estadisticas' },
+        { texto: 'Reportes', icono: '📄', ruta: 'reportes/index.html', seccion: 'reportes' },
+        { texto: 'Respaldo', icono: '💾', ruta: 'respaldo/index.html', seccion: 'respaldo' },
+        { texto: 'Configuración', icono: '⚙️', ruta: 'configuracion/index.html', seccion: 'configuracion' }
     ];
 
     EC.alCargar = function (fn) {
@@ -56,6 +56,13 @@
             (tipo === 'error' ? 'alert' : 'status') + '"></div>';
 
         zona.firstChild.textContent = texto;
+    };
+
+    // Año calendario derivado de la fecha de ingreso guardada por MySQL.
+    EC.anioIngreso = function (fecha) {
+        if (!fecha) return '—';
+        var coincidencia = String(fecha).match(/^(\d{4})/);
+        return coincidencia ? coincidencia[1] : '—';
     };
 
     EC.formato = {

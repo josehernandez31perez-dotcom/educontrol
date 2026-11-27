@@ -47,6 +47,12 @@ respaldos; ese rol está **retirado del modo v4** y su eliminación del modo leg
 
 Lo que queda por comprobar en el XAMPP local está en `bd/ESTADO_Y_LIMITES_v5.md` (instrucciones de prueba y plan de instalación).
 
+## Fecha y año de ingreso del estudiante (primera actualización)
+
+Al registrar un estudiante, MariaDB asigna automáticamente `fecha_registro` mediante `CURRENT_TIMESTAMP`. La interfaz la presenta como **fecha de ingreso** y calcula el **año de ingreso** tomando el año de esa fecha; no se agrega una columna nueva ni se ejecuta una migración.
+
+En esta primera entrega se muestra en el listado y ficha del estudiante, y en el listado/detalle de calificaciones. La fecha de registro de cada calificación se mantiene separada: no es el año de ingreso del estudiante ni representa por sí sola un período académico. El año académico de cada nota/período queda para una fase posterior, porque el esquema actual no guarda ese dato.
+
 ## Estados de estudiante
 
 | Estado | Significado | Aparece al registrar notas |
