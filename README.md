@@ -1,7 +1,12 @@
 # EduControl
 
-Sistema de gestión académica y calificaciones. Interfaz con HTML, CSS y JavaScript sin frameworks.
-Los datos se guardan en el navegador con `localStorage`. Todavía no hay conexión a una base de datos externa.
+Sistema de gestión académica y calificaciones para una institución. Está en dos modos:
+
+- **Modo legado (etapas A–D):** interfaz HTML/JavaScript con datos en `localStorage`. Las pantallas `login.html`,
+  `index.html`, etc. Es la versión que ya usa la instalación actual.
+- **Modo v4 (Etapa E):** interfaz en `v4/` que habla con el backend PHP de `api/v4/` y con la base MariaDB
+  `educontrol`. Roles ADMIN, PROFESOR y ALUMNO, evaluaciones, NO APLICA, cierres, reaperturas y auditoría.
+  **No instalado en la base real.** Ver "Estado de la Etapa E" más abajo.
 
 ## Cómo abrirlo
 
@@ -13,12 +18,34 @@ Luego abre `http://localhost:8000/login.html`.
 
 ## Acceso
 
-El sistema tiene dos roles:
+### Modo v4 (Etapa E)
 
-- **ADMIN**: acceso completo, incluidos respaldos y configuración académica.
-- **CONSULTA**: solo consulta y reportes. No puede modificar datos ni acceder a respaldos o configuración.
+Tres roles, definidos en la base de datos:
+
+- **ADMIN**: cuentas, períodos, secciones, asignaciones, inscripciones, cierres, reaperturas, correcciones y auditoría.
+- **PROFESOR**: solo sus secciones asignadas: evaluaciones, notas, NO APLICA y observaciones de sus alumnos.
+- **ALUMNO**: solo sus propias notas, evaluaciones y promedios. Nunca ve rankings ni datos de otros alumnos.
+
+La identidad no viaja en la petición: la cookie de sesión (`ec_sesion`, `HttpOnly`) identifica la sesión y la base
+resuelve el usuario, el rol y el estado en cada operación. Las cuentas se crean desde ADMIN; no hay registro público.
+
+### Modo legado (etapas A–D)
 
 Las credenciales de prueba no se documentan en este archivo. Pide al responsable del proyecto los accesos de prueba.
+Los roles del modo legado todavía incluyen el rol histórico de solo consulta en el código de `login.php` y en los
+respaldos; ese rol está **retirado del modo v4** y su eliminación del modo legado queda pendiente (ver "Pendientes").
+
+## Estado de la Etapa E
+
+| Parte | Estado | Verificación |
+|---|---|---|
+| Esquema de base de datos (`bd/01`, `02`, `04`, `05`, `06`) | Escrito | **No ejecutado en MariaDB** |
+| Backend PHP (`api/v4/`) | Escrito | **No ejecutado (PHP no disponible en el entorno de desarrollo)** |
+| Interfaz (`v4/`, `js/v4/`) | Escrita | Solo funciones puras probadas (conciliación, escape, exportación, visibilidad) |
+| Cálculos académicos (`js/academico.js`) | Probado | 28 comprobaciones + mutaciones |
+| Exportación CSV, Excel (XLSX) y PDF (`js/exportar.js`) | Probado | Validado con herramientas independientes |
+
+Lo que queda por comprobar en el XAMPP local está en `bd/ESTADO_Y_LIMITES_v5.md` (instrucciones de prueba y plan de instalación).
 
 ## Estados de estudiante
 

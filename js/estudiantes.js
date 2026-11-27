@@ -1,13 +1,17 @@
-/* js/estudiantes.js - Listado de estudiantes desde MySQL (api/listar_estudiantes.php).
-   La búsqueda se hace sobre los datos ya cargados. Los botones Ver, Editar y Eliminar
-   conservan su diseño, pero todavía no ejecutan acciones sobre MySQL (ver mensajes). */
+/* js/estudiantes.js - Listado de estudiantes (lectura con EC.datos).
+   Modo local: datos de localStorage. Modo MySQL: api/listar_estudiantes.php (solo lectura).
+   La búsqueda se hace sobre los datos ya cargados. Los botones Ver, Editar y Eliminar conservan
+   su diseño, pero todavía no ejecutan acciones (ver mensajes). */
 (function () {
     'use strict';
     var EC = window.EC;
 
-    var URL_LISTADO = '../api/listar_estudiantes.php';
-    var MENSAJE_ERROR_CONEXION = 'No se pudo conectar con la base de datos. Verifica que Apache y MySQL estén iniciados en XAMPP.';
-    var MENSAJE_PENDIENTE = 'Esta acción todavía no está conectada a MySQL. No se modificó ningún dato.';
+    // Texto del aviso según la fuente: en modo local no se debe hablar de MySQL
+    function mensajePendiente() {
+        return EC.fuente === 'mysql'
+            ? 'Esta acción todavía no está conectada a MySQL. No se modificó ningún dato.'
+            : 'Esta acción todavía no está disponible en el listado. No se modificó ningún dato.';
+    }
 
     EC.alCargar(function () {
         var esAdmin = EC.auth.sesion().rol === 'ADMIN';
@@ -18,18 +22,7 @@
         var estudiantes = [];
         var cargando = true;
         var errorCarga = false;
-
-        // MySQL devuelve "2026-10-01 09:00:00"; JavaScript necesita "2026-10-01T09:00:00"
-        function normalizarRegistro(r) {
-            return {
-                id: Number(r.id),
-                cedula: String(r.cedula),
-                nombre: String(r.nombre),
-                apellido: String(r.apellido),
-                estado: String(r.estado),
-                fecha_registro: typeof r.fecha_registro === 'string' ? r.fecha_registro.replace(' ', 'T') : ''
-            };
-        }
+        var textoError = '';
 
         function filtrar(termino) {
             var t = EC.normalizarTexto(termino).trim();
@@ -50,7 +43,7 @@
 
             if (errorCarga) {
                 contador.textContent = 'Estudiantes registrados: no disponible';
-                zona.innerHTML = '<div class="alerta alerta-error" role="alert">' + EC.esc(MENSAJE_ERROR_CONEXION) + '</div>' +
+                zona.innerHTML = '<div class="alerta alerta-error" role="alert">' + EC.esc(textoError) + '</div>' +
                     '<button type="button" class="btn btn-secundario" id="btn-reintentar">Reintentar</button>';
                 return;
             }
@@ -82,29 +75,23 @@
                 '</tr></thead><tbody>' + filas + '</tbody></table></div>';
         }
 
-        // Carga asíncrona desde MySQL
         function cargarEstudiantes() {
             cargando = true;
             errorCarga = false;
             pintar();
 
-            return fetch(URL_LISTADO, { cache: 'no-store', headers: { 'Accept': 'application/json' } })
-                .then(function (respuesta) {
-                    if (!respuesta.ok) { throw new Error('HTTP ' + respuesta.status); }
-                    return respuesta.json();
-                })
-                .then(function (datos) {
-                    if (!Array.isArray(datos)) { throw new Error('Respuesta inesperada'); }
-                    // Mismo orden que antes: apellido y nombre (la consulta de la API no ordena)
-                    estudiantes = datos.map(normalizarRegistro).sort(function (a, b) {
-                        return (a.apellido + ' ' + a.nombre).localeCompare(b.apellido + ' ' + b.nombre, 'es');
-                    });
+            return EC.datos.estudiantes()
+                .then(function (lista) {
+                    // La fuente ya devuelve los estudiantes ordenados por apellido y nombre
+                    estudiantes = lista;
                     errorCarga = false;
-                })
-                .catch(function () {
+                }, function (error) {
+                    // Sesión caducada: el adaptador ya redirige al login
+                    if (error && error.sesionCaducada) { return; }
                     estudiantes = [];
                     errorCarga = true;
-                    EC.mostrarMensaje('error', MENSAJE_ERROR_CONEXION);
+                    textoError = EC.mensajeDeError(error);
+                    EC.mostrarMensaje('error', textoError);
                 })
                 .then(function () {
                     cargando = false;
@@ -120,7 +107,7 @@
                 return;
             }
             if (evento.target.closest('.btn-ver') || evento.target.closest('.btn-editar') || evento.target.closest('.btn-eliminar')) {
-                EC.mostrarMensaje('info', MENSAJE_PENDIENTE);
+                EC.mostrarMensaje('info', mensajePendiente());
             }
         });
 

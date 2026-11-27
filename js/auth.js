@@ -1,51 +1,103 @@
-/* js/auth.js - Inicio de sesión DEMOSTRATIVO con localStorage.
-   No es un sistema seguro para producción: el código y los hashes son visibles en el navegador. */
+/* js/auth.js - Sesión y autenticación mediante la API PHP.
+   La sesión vive en el servidor (cookie HttpOnly). El navegador solo conserva en memoria
+   el usuario, el rol y el token CSRF que devuelve el servidor. */
 (function (global) {
     'use strict';
 
     var EC = global.EC = global.EC || {};
-    var CLAVE_SESION = 'educontrol_sesion';
 
-    function aHex(buffer) {
-        return Array.prototype.map.call(new Uint8Array(buffer), function (b) {
-            return b.toString(16).padStart(2, '0');
-        }).join('');
+    var sesionActual = null;   // sesión verificada por el servidor en esta página
+    var tokenCsrf = '';
+
+    function urlApi(ruta) {
+        return (global.EC_BASE || '') + 'api/' + ruta;
     }
 
     EC.auth = {
-        // Hash SHA-256 de un texto (Web Crypto)
-        hash: function (texto) {
-            if (!global.crypto || !global.crypto.subtle) {
-                return Promise.reject(new Error('Web Crypto no disponible'));
-            }
-            return global.crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto)).then(aHex);
+        // Síncrono: devuelve la sesión verificada al cargar la página, o null
+        sesion: function () {
+            return sesionActual;
         },
 
-        // Devuelve true si el usuario y la contraseña coinciden con un usuario guardado
-        iniciarSesion: function (usuario, clave) {
-            var encontrado = EC.usuarios.buscarPorNombre(String(usuario || '').trim());
-            if (!encontrado) { return Promise.resolve(false); }
+        // Uso interno de las pruebas automatizadas
+        _fijarSesion: function (valor) {
+            sesionActual = valor;
+            tokenCsrf = valor ? 'token-de-prueba' : '';
+        },
 
-            return EC.auth.hash(String(clave || '')).then(function (hash) {
-                if (hash !== encontrado.password_hash) { return false; }
-                global.localStorage.setItem(CLAVE_SESION, JSON.stringify({
-                    usuario: encontrado.nombre_usuario,
-                    rol: encontrado.rol
-                }));
-                return true;
+        // Pregunta al servidor si hay sesión. Devuelve el usuario o null.
+        cargarSesion: function () {
+            return fetch(urlApi('sesion.php'), { cache: 'no-store', headers: { 'Accept': 'application/json' } })
+                .then(function (respuesta) {
+                    if (respuesta.status === 401) {
+                        sesionActual = null;
+                        tokenCsrf = '';
+                        return null;
+                    }
+                    if (!respuesta.ok) { throw new Error('HTTP ' + respuesta.status); }
+                    return respuesta.json().then(function (datos) {
+                        tokenCsrf = datos.csrf || '';
+                        sesionActual = { usuario: datos.usuario, rol: datos.rol };
+                        return sesionActual;
+                    });
+                });
+        },
+
+        // Obtiene el token CSRF necesario para iniciar sesión
+        obtenerCsrf: function () {
+            return fetch(urlApi('csrf.php'), { cache: 'no-store', headers: { 'Accept': 'application/json' } })
+                .then(function (respuesta) {
+                    if (!respuesta.ok) { throw new Error('HTTP ' + respuesta.status); }
+                    return respuesta.json();
+                })
+                .then(function (datos) {
+                    tokenCsrf = datos.csrf;
+                    return datos.csrf;
+                });
+        },
+
+        // Resuelve true si las credenciales son correctas, false si no lo son.
+        // Lanza error si no se puede contactar con el servidor.
+        iniciarSesion: function (usuario, clave) {
+            return EC.auth.obtenerCsrf().then(function () {
+                return fetch(urlApi('login.php'), {
+                    method: 'POST',
+                    cache: 'no-store',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-Token': tokenCsrf
+                    },
+                    body: JSON.stringify({ usuario: String(usuario || ''), clave: String(clave || '') })
+                });
+            }).then(function (respuesta) {
+                if (respuesta.status === 401) { return false; }
+                if (!respuesta.ok) { throw new Error('HTTP ' + respuesta.status); }
+                return respuesta.json().then(function (datos) {
+                    tokenCsrf = datos.csrf || '';
+                    sesionActual = { usuario: datos.usuario, rol: datos.rol };
+                    return true;
+                });
             });
         },
 
-        sesion: function () {
-            try {
-                return JSON.parse(global.localStorage.getItem(CLAVE_SESION));
-            } catch (error) {
-                return null;
-            }
-        },
-
+        // Cierra la sesión en el servidor. Resuelve true solo si el servidor confirma el cierre.
+        // Si no lo confirma (red caída, error HTTP o respuesta no válida), rechaza la promesa
+        // y conserva la sesión local para que el usuario pueda reintentarlo.
         cerrarSesion: function () {
-            global.localStorage.removeItem(CLAVE_SESION);
+            return fetch(urlApi('logout.php'), {
+                method: 'POST',
+                cache: 'no-store',
+                headers: { 'Accept': 'application/json', 'X-CSRF-Token': tokenCsrf }
+            }).then(function (respuesta) {
+                if (!respuesta.ok) { throw new Error('HTTP ' + respuesta.status); }
+                return respuesta.json();
+            }).then(function (datos) {
+                if (!datos || datos.ok !== true) { throw new Error('El servidor no confirmó el cierre de sesión.'); }
+                sesionActual = null;
+                tokenCsrf = '';
+                return true;
+            });
         }
     };
 })(window);

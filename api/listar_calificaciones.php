@@ -1,5 +1,6 @@
 <?php
-require_once "conexion.php";
+require_once "bootstrap.php";
+requerir_sesion();
 
 $sql = "SELECT
             c.id,
@@ -7,7 +8,11 @@ $sql = "SELECT
             e.apellido,
             m.nombre AS materia,
             c.nota,
-            c.fecha_registro
+            c.fecha_registro,
+            c.estudiante_id,
+            c.materia_id,
+            e.cedula,
+            e.nombre
         FROM calificaciones c
         INNER JOIN estudiantes e
             ON c.estudiante_id = e.id

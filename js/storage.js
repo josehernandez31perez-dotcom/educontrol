@@ -362,85 +362,42 @@
     };
 
     // ---------- Cálculos académicos ----------
+    // Regla de aprobación vigente (configuración). Los cálculos puros la reciben como parámetro.
+    function aprobar(valor) {
+        return EC.configuracion.aprueba(valor);
+    }
+
+    // Los cálculos se delegan en js/calculos.js (EC.calculosAcademicos); los nombres y resultados no cambian.
     EC.calculos = {
-        // Promedio de un estudiante a partir de sus notas (null si no tiene notas)
         promedioDeEstudiante: function (id) {
-            var notas = leer(CLAVES.calificaciones)
-                .filter(function (c) { return c.estudiante_id === Number(id); })
-                .map(function (c) { return Number(c.nota); });
-            if (!notas.length) { return null; }
-            var suma = notas.reduce(function (a, b) { return a + b; }, 0);
-            return redondear(suma / notas.length);
+            return EC.calculosAcademicos.promedioDeEstudiante(leer(CLAVES.calificaciones), id);
         },
 
-        // Regla: promedio >= nota de aprobación APROBADO; si no, REPROBADO; sin notas SIN NOTAS
         estadoAcademico: function (promedio) {
-            if (promedio === null || promedio === undefined) { return 'SIN NOTAS'; }
-            return EC.configuracion.aprueba(promedio) ? 'APROBADO' : 'REPROBADO';
+            return EC.calculosAcademicos.estadoAcademico(promedio, aprobar);
         },
 
-        // Equivale a la vista v_resumen_estudiantes (incluye a todos los estudiantes)
         resumen: function () {
-            return leer(CLAVES.estudiantes).map(function (e) {
-                var notas = leer(CLAVES.calificaciones).filter(function (c) { return c.estudiante_id === e.id; });
-                var promedio = EC.calculos.promedioDeEstudiante(e.id);
-                return {
-                    id: e.id,
-                    cedula: e.cedula,
-                    nombre: e.nombre,
-                    apellido: e.apellido,
-                    estado: e.estado,
-                    cantidad: notas.length,
-                    promedio: promedio,
-                    estado_academico: EC.calculos.estadoAcademico(promedio)
-                };
-            }).sort(ordenarRanking);
+            return EC.calculosAcademicos.resumen(leer(CLAVES.estudiantes), leer(CLAVES.calificaciones), aprobar);
         },
 
         resumenDeEstudiante: function (id) {
-            return EC.calculos.resumen().filter(function (r) { return r.id === Number(id); })[0] || null;
+            return EC.calculosAcademicos.resumenDeEstudiante(EC.calculos.resumen(), id);
         },
 
         notasDeEstudiante: function (id) {
-            return EC.calificaciones.listarDetalle().filter(function (c) {
-                return c.estudiante_id === Number(id);
-            });
+            return EC.calculosAcademicos.notasDeEstudiante(EC.calificaciones.listarDetalle(), id);
         },
 
-        // Búsqueda por cédula, nombre o apellido, sin distinguir mayúsculas ni tildes
         buscar: function (termino) {
-            var t = normalizar(termino).trim();
-            if (!t) { return EC.calculos.resumen(); }
-            return EC.calculos.resumen().filter(function (r) {
-                return normalizar(r.cedula).indexOf(t) !== -1 ||
-                       normalizar(r.nombre).indexOf(t) !== -1 ||
-                       normalizar(r.apellido).indexOf(t) !== -1;
-            });
+            return EC.calculosAcademicos.buscar(EC.calculos.resumen(), termino);
         },
 
-        // Totales, mejor/menor promedio y ranking (los sin notas no cuentan para mejor/menor)
         estadisticas: function () {
-            var resumen = EC.calculos.resumen();
-            var conNotas = resumen.filter(function (r) { return r.promedio !== null; });
-            var suma = conNotas.reduce(function (a, r) { return a + r.promedio; }, 0);
-            var menor = conNotas.slice().sort(function (a, b) {
-                return (a.promedio - b.promedio) || compararNombre(a, b);
-            })[0] || null;
-
-            return {
-                totalEstudiantes: resumen.length,
-                totalMaterias: leer(CLAVES.materias).length,
-                aprobados: resumen.filter(function (r) { return r.estado_academico === 'APROBADO'; }).length,
-                reprobados: resumen.filter(function (r) { return r.estado_academico === 'REPROBADO'; }).length,
-                sinNotas: resumen.length - conNotas.length,
-                promedioGeneral: conNotas.length ? redondear(suma / conNotas.length) : null,
-                mejor: conNotas[0] || null,
-                menor: menor,
-                ranking: conNotas,
-                sinNotasLista: resumen.filter(function (r) { return r.promedio === null; })
-            };
+            return EC.calculosAcademicos.estadisticas(EC.calculos.resumen(), leer(CLAVES.materias).length);
         }
     };
 
-    EC.inicializarDatos();
+    // Etapa D: en modo MySQL no se siembran datos de demostración en localStorage
+    if (EC.fuente !== 'mysql') { EC.inicializarDatos(); }
 })(window);

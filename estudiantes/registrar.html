@@ -6,7 +6,7 @@
     <title>EduControl - Registrar estudiante</title>
     <link rel="stylesheet" href="../css/estilos.css">
 </head>
-<body data-seccion="estudiantes" data-rol="ADMIN" data-modo="registrar">
+<body data-escritura="true" data-seccion="estudiantes" data-rol="ADMIN" data-modo="registrar">
 <script>window.EC_BASE = '../';</script>
 <div class="layout">
     <aside class="sidebar" id="sidebar"></aside>
@@ -16,6 +16,8 @@
         <div id="contenido-pagina"><section class="panel"><form id="form-estudiante" class="formulario" novalidate><div class="campo"><label for="cedula">Cédula *</label><input id="cedula" name="cedula" maxlength="20"><span class="error-texto" data-error="cedula"></span></div><div class="campo"><label for="nombre">Nombre *</label><input id="nombre" name="nombre" maxlength="60"><span class="error-texto" data-error="nombre"></span></div><div class="campo"><label for="apellido">Apellido *</label><input id="apellido" name="apellido" maxlength="60"><span class="error-texto" data-error="apellido"></span></div><div class="campo"><label for="estado">Estado</label><select id="estado" name="estado"><option value="ACTIVO">ACTIVO</option><option value="INACTIVO">INACTIVO</option><option value="RETIRADO">RETIRADO</option><option value="GRADUADO">GRADUADO</option></select><span class="error-texto" data-error="estado"></span></div><div class="acciones-form"><button type="submit" class="btn btn-primario">Registrar estudiante</button><a class="btn btn-secundario" href="index.html">Cancelar</a></div></form></section></div>
     </main>
 </div>
+<script src="../js/config-fuente.js"></script>
+<script src="../js/calculos.js"></script>
 <script src="../js/storage.js"></script>
 <script src="../js/configuracion.js"></script>
 <script src="../js/auth.js"></script>

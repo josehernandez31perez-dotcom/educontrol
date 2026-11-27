@@ -5,7 +5,7 @@ const path = require('path');
 const vm = require('vm');
 
 const RAIZ_JS = path.join(__dirname, '..', 'js');
-const MODULOS = ['storage.js', 'configuracion.js', 'auth.js', 'respaldo.js'];
+const MODULOS = ['config-fuente.js', 'calculos.js', 'storage.js', 'configuracion.js', 'auth.js', 'respaldo.js', 'datos-mysql.js', 'datos.js'];
 
 function crearEntorno() {
     const almacen = {};
@@ -24,8 +24,9 @@ function crearEntorno() {
         EC: ctx.EC,
         almacen,
         fallarEn: clave => { fallarEn = clave; },
-        sesion: (usuario, rol) => { almacen['educontrol_sesion'] = JSON.stringify({ usuario, rol }); },
-        sinSesion: () => { delete almacen['educontrol_sesion']; }
+        // La sesión ahora la confirma el servidor: en las pruebas se fija directamente en el módulo
+        sesion: (usuario, rol) => { ctx.EC.auth._fijarSesion({ usuario, rol }); },
+        sinSesion: () => { ctx.EC.auth._fijarSesion(null); }
     };
 }
 

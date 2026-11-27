@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduControl · Acceso (v4)</title>
+  <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body>
+  <main class="contenedor-login">
+    <h1>EduControl</h1>
+    <form id="form-login" class="formulario">
+      <label>Usuario <input type="text" name="usuario" required maxlength="50" autocomplete="username"></label>
+      <label>Contraseña <input type="password" name="password" required maxlength="72" autocomplete="current-password"></label>
+      <button type="submit" class="btn btn-primario">Entrar</button>
+    </form>
+    <div id="mensaje" class="alerta alerta-error" role="alert" hidden></div>
+  </main>
+  <script src="../js/v4/cliente.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('expirada')) {
+        var m = document.getElementById('mensaje');
+        m.textContent = 'Su sesión ha caducado. Vuelva a entrar.';
+        m.hidden = false;
+      }
+      document.getElementById('form-login').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var f = ev.target;
+        EC.v4.llamar('login', 'POST', { usuario: f.usuario.value, password: f.password.value }, '')
+          .then(function () { window.location.href = 'index.html'; })
+          .catch(function (e) {
+            var m = document.getElementById('mensaje');
+            m.textContent = e.message;
+            m.hidden = false;
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

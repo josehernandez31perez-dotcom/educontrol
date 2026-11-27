@@ -1,0 +1,4 @@
+# Bloquea el acceso directo a la configuración real y a las bibliotecas.
+<FilesMatch "^(config\.php|lib\.php|acciones\.php)$">
+  Require all denied
+</FilesMatch>

@@ -91,9 +91,15 @@
             '<div class="usuario-box"><span>Usuario conectado</span><strong>' + EC.esc(sesion.usuario) +
             '</strong><small>Rol: ' + EC.esc(sesion.rol) + '</small></div>';
 
-        document.getElementById('btn-cerrar-sesion').addEventListener('click', function () {
-            EC.auth.cerrarSesion();
-            global.location.href = base + 'login.html?salio=1';
+        document.getElementById('btn-cerrar-sesion').addEventListener('click', function (evento) {
+            var boton = evento.currentTarget;
+            boton.disabled = true;
+            EC.auth.cerrarSesion().then(function () {
+                global.location.href = base + 'login.html?salio=1';
+            }, function () {
+                boton.disabled = false;
+                EC.mostrarMensaje('error', 'No se pudo cerrar la sesión en el servidor. Revisa la conexión con XAMPP e inténtalo de nuevo.');
+            });
         });
     }
 
@@ -112,41 +118,64 @@
     function iniciar() {
         var body = document.body;
         var base = global.EC_BASE || '';
-        var sesion = EC.auth.sesion();
 
-        listo = true;
-
-        if (!sesion || !sesion.usuario) {
-            global.location.href = base + 'login.html';
-            return;
-        }
-
-        renderizarMenu(sesion);
-
-        // Página que requiere un rol concreto (por ejemplo ADMIN)
-        var rolRequerido = body.dataset.rol;
-        if (rolRequerido && rolRequerido !== sesion.rol) {
-            var contenido = document.getElementById('contenido-pagina');
-            if (contenido) {
-                contenido.innerHTML =
-                    '<section class="panel"><div class="alerta alerta-error" role="alert">' +
-                    'No tienes permiso para realizar esta acción. Tu rol permite únicamente consultar la información.' +
-                    '</div><a class="btn btn-secundario" href="' + base + 'index.html">Volver al Dashboard</a></section>';
+        // La sesión la confirma el servidor antes de mostrar la página.
+        // Hasta que responda, las páginas quedan en cola (EC.alCargar).
+        EC.auth.cargarSesion().then(function (sesion) {
+            listo = true;
+            if (!sesion) {
+                global.location.href = base + 'login.html';
+                return;
             }
+
+            renderizarMenu(sesion);
+
+            // Modo MySQL (Etapa D): aviso de solo lectura en todas las páginas
+            if (EC.fuente === 'mysql') {
+                EC.mostrarMensaje('info', 'Modo MySQL (solo lectura): los datos se leen de la base de datos y las modificaciones están deshabilitadas en esta versión.');
+            }
+
+            // Página que requiere un rol concreto (por ejemplo ADMIN)
+            var rolRequerido = body.dataset.rol;
+            if (rolRequerido && rolRequerido !== sesion.rol) {
+                var contenido = document.getElementById('contenido-pagina');
+                if (contenido) {
+                    contenido.innerHTML =
+                        '<section class="panel"><div class="alerta alerta-error" role="alert">' +
+                        'No tienes permiso para realizar esta acción. Tu rol permite únicamente consultar la información.' +
+                        '</div><a class="btn btn-secundario" href="' + base + 'index.html">Volver al Dashboard</a></section>';
+                }
+                permitido = false;
+                return;
+            }
+
+            // Modo MySQL (Etapa D): las páginas de escritura no se ejecutan y muestran un aviso
+            if (EC.fuente === 'mysql' && body.dataset.escritura === 'true') {
+                var zonaBloqueada = document.getElementById('contenido-pagina');
+                if (zonaBloqueada) {
+                    zonaBloqueada.innerHTML = '<section class="panel"><div class="alerta alerta-info" role="status">' +
+                        'Las modificaciones están deshabilitadas en el modo MySQL de esta versión. No se ha modificado ningún dato.' +
+                        '</div><a class="btn btn-secundario" href="' + base + 'index.html">Volver al Dashboard</a></section>';
+                }
+                permitido = false;
+                return;
+            }
+
+            // Ocultar acciones de modificación a quien no es ADMIN (la API también las valida)
+            if (sesion.rol !== 'ADMIN') {
+                document.querySelectorAll('[data-solo-admin]').forEach(function (el) {
+                    el.parentNode.removeChild(el);
+                });
+            }
+
+            mostrarFlash();
+            permitido = true;
+            pendientes.forEach(function (fn) { fn(); });
+        }, function () {
+            listo = true;
             permitido = false;
-            return;
-        }
-
-        // Ocultar acciones de modificación a quien no es ADMIN (la página también las valida)
-        if (sesion.rol !== 'ADMIN') {
-            document.querySelectorAll('[data-solo-admin]').forEach(function (el) {
-                el.parentNode.removeChild(el);
-            });
-        }
-
-        mostrarFlash();
-        permitido = true;
-        pendientes.forEach(function (fn) { fn(); });
+            EC.mostrarMensaje('error', 'No se pudo verificar tu sesión. Revisa que Apache y MySQL estén iniciados en XAMPP.');
+        });
     }
 
     // Botón de impresión: usa la función del navegador (Guardar como PDF)

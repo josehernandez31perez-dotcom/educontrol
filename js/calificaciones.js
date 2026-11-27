@@ -1,10 +1,12 @@
-/* js/calificaciones.js - Listado de calificaciones, eliminación y rendimiento por estudiante */
+/* js/calificaciones.js - Listado de calificaciones, eliminación y rendimiento por estudiante (lectura con EC.datos) */
 (function () {
     'use strict';
     var EC = window.EC;
 
     EC.alCargar(function () {
         var esAdmin = EC.auth.sesion().rol === 'ADMIN';
+        // En modo MySQL las modificaciones están deshabilitadas en esta versión (Etapa D)
+        var puedeModificar = esAdmin && EC.fuente !== 'mysql';
         var params = new URLSearchParams(window.location.search);
         var seleccionado = Number(params.get('estudiante_id')) || 0;
 
@@ -13,14 +15,16 @@
         var zonaTabla = document.getElementById('tabla-calificaciones');
         var contador = document.getElementById('contador');
 
-        selector.innerHTML = '<option value="">— Selecciona un estudiante —</option>' +
-            EC.estudiantes.listar().map(function (e) {
-                return '<option value="' + e.id + '"' + (e.id === seleccionado ? ' selected' : '') + '>' +
-                    EC.esc(e.apellido + ' ' + e.nombre + ' (' + e.cedula + ')') + '</option>';
-            }).join('');
+        function pintarSelector(estudiantes) {
+            selector.innerHTML = '<option value="">— Selecciona un estudiante —</option>' +
+                estudiantes.map(function (e) {
+                    return '<option value="' + e.id + '"' + (e.id === seleccionado ? ' selected' : '') + '>' +
+                        EC.esc(e.apellido + ' ' + e.nombre + ' (' + e.cedula + ')') + '</option>';
+                }).join('');
+        }
 
-        if (seleccionado) {
-            var r = EC.calculos.resumenDeEstudiante(seleccionado);
+        function pintarRendimiento(r) {
+            if (!seleccionado) { return; }
             zonaRendimiento.innerHTML = r
                 ? '<div class="resumen-grid">' +
                   '<div class="resumen-item"><span class="stat-etiqueta">Nombre completo</span><strong>' + EC.esc(r.nombre + ' ' + r.apellido) + '</strong></div>' +
@@ -31,8 +35,7 @@
                 : '<p class="vacio">No se encontró el estudiante seleccionado.</p>';
         }
 
-        function pintarTabla() {
-            var lista = EC.calificaciones.listarDetalle();
+        function pintarTabla(lista) {
             contador.textContent = 'Calificaciones registradas: ' + lista.length;
 
             if (!lista.length) {
@@ -42,7 +45,7 @@
 
             var filas = lista.map(function (c) {
                 var acciones = '';
-                if (esAdmin) {
+                if (puedeModificar) {
                     acciones = '<a class="btn btn-pequeno btn-secundario" href="editar.html?id=' + c.id + '">Editar</a> ' +
                         '<button type="button" class="btn btn-pequeno btn-peligro btn-eliminar" data-id="' + c.id +
                         '" data-texto="' + EC.esc(c.materia + ' de ' + c.nombre + ' ' + c.apellido) + '">Eliminar</button>';
@@ -58,18 +61,32 @@
                 '</tr></thead><tbody>' + filas + '</tbody></table></div>';
         }
 
+        function cargar() {
+            EC.cargarVista(zonaTabla, function () {
+                return Promise.all([
+                    EC.datos.estudiantes(),
+                    EC.datos.calificacionesDetalle(),
+                    seleccionado ? EC.datos.resumenDeEstudiante(seleccionado) : Promise.resolve(null)
+                ]);
+            }, function (datos) {
+                pintarSelector(datos[0]);
+                pintarRendimiento(datos[2]);
+                pintarTabla(datos[1]);
+            });
+        }
+
         zonaTabla.addEventListener('click', function (evento) {
             var boton = evento.target.closest('.btn-eliminar');
-            if (!boton) { return; }
+            if (!boton || !puedeModificar) { return; }
             if (!window.confirm('¿Eliminar la calificación de ' + boton.dataset.texto + '?')) { return; }
             if (EC.calificaciones.eliminar(boton.dataset.id)) {
                 EC.mostrarMensaje('ok', 'Calificación eliminada correctamente.');
             } else {
                 EC.mostrarMensaje('error', 'No se encontró la calificación solicitada.');
             }
-            pintarTabla();
+            cargar();
         });
 
-        pintarTabla();
+        cargar();
     });
 })();

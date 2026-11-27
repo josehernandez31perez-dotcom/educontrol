@@ -1,5 +1,6 @@
 <?php
-require_once "conexion.php";
+require_once "bootstrap.php";
+requerir_sesion();
 
 $sql = "SELECT id, cedula, nombre, apellido, estado, fecha_registro
         FROM estudiantes";
