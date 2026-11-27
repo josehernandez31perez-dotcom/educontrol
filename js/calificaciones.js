@@ -1,5 +1,5 @@
 
-/* js/calificaciones.js - Listado de calificaciones y rendimiento */
+/* js/calificaciones.js - Listado, rendimiento y gestión de calificaciones */
 (function () {
     'use strict';
 
@@ -7,11 +7,8 @@
 
     EC.alCargar(function () {
         var esAdmin = EC.auth.sesion().rol === 'ADMIN';
-
-        // Los administradores pueden editar tanto en MySQL como en local.
-        // La eliminación en MySQL permanece desactivada por ahora.
         var puedeEditar = esAdmin;
-        var puedeEliminar = esAdmin && EC.fuente !== 'mysql';
+        var puedeEliminar = esAdmin;
 
         var params = new URLSearchParams(window.location.search);
         var seleccionado = Number(params.get('estudiante_id')) || 0;
@@ -51,6 +48,60 @@
                     EC.badge(r.estado_academico) + '</div>' +
                     '</div>'
                 : '<p class="vacio">No se encontró el estudiante seleccionado.</p>';
+        }
+
+        function eliminarMySQL(id, texto, boton) {
+            if (!window.confirm('¿Estás seguro de eliminar la calificación de ' + texto + '?')) {
+                return;
+            }
+
+            boton.disabled = true;
+
+            EC.auth.obtenerCsrf()
+                .then(function (token) {
+                    if (!token) {
+                        throw new Error('No se pudo obtener el token de seguridad.');
+                    }
+
+                    return fetch((window.EC_BASE || '') + 'api/eliminar_calificacion.php', {
+                        method: 'POST',
+                        cache: 'no-store',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-Token': token
+                        },
+                        body: JSON.stringify({ id: id })
+                    });
+                })
+                .then(function (respuesta) {
+                    return respuesta.json().then(function (datos) {
+                        return {
+                            ok: respuesta.ok,
+                            datos: datos
+                        };
+                    });
+                })
+                .then(function (resultado) {
+                    if (!resultado.ok || !resultado.datos.ok) {
+                        throw new Error(
+                            resultado.datos.mensaje ||
+                            'No fue posible eliminar la calificación.'
+                        );
+                    }
+
+                    EC.mostrarMensaje('ok', resultado.datos.mensaje);
+                    cargar();
+                })
+                .catch(function (error) {
+                    console.error('Error al eliminar calificación:', error);
+                    EC.mostrarMensaje(
+                        'error',
+                        error.message || 'No se pudo comunicar con el servidor.'
+                    );
+                    boton.disabled = false;
+                });
         }
 
         function pintarTabla(lista) {
@@ -171,25 +222,17 @@
                 return;
             }
 
-            var boton = evento.target.closest('.btn-eliminar');
+            var botonEliminar = evento.target.closest('.btn-eliminar');
 
-            if (!boton || !puedeEliminar) {
+            if (!botonEliminar || !puedeEliminar) {
                 return;
             }
 
-            if (!window.confirm(
-                '¿Eliminar la calificación de ' + boton.dataset.texto + '?'
-            )) {
-                return;
-            }
-
-            if (EC.calificaciones.eliminar(boton.dataset.id)) {
-                EC.mostrarMensaje('ok', 'Calificación eliminada correctamente.');
-            } else {
-                EC.mostrarMensaje('error', 'No se encontró la calificación solicitada.');
-            }
-
-            cargar();
+            eliminarMySQL(
+                botonEliminar.dataset.id,
+                botonEliminar.dataset.texto,
+                botonEliminar
+            );
         });
 
         cargar();
