@@ -39,8 +39,11 @@
         });
     }
 
-    function registrarMySQL(form, valores) {
+    function enviarMySQL(form, valores, modo) {
         var boton = form.querySelector('button[type="submit"]');
+        var archivo = modo === 'editar'
+            ? 'actualizar_calificacion.php'
+            : 'registrar_calificacion.php';
 
         boton.disabled = true;
         mostrarErrores(form, {});
@@ -51,8 +54,10 @@
                     throw new Error('No se pudo obtener el token de seguridad.');
                 }
 
-                return fetch((window.EC_BASE || '') + 'api/registrar_calificacion.php', {
+                return fetch((window.EC_BASE || '') + 'api/' + archivo, {
                     method: 'POST',
+                    cache: 'no-store',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -63,7 +68,10 @@
             })
             .then(function (respuesta) {
                 return respuesta.json().then(function (datos) {
-                    return { ok: respuesta.ok, datos: datos };
+                    return {
+                        ok: respuesta.ok,
+                        datos: datos
+                    };
                 });
             })
             .then(function (resultado) {
@@ -71,19 +79,22 @@
 
                 if (!resultado.ok || !datos.ok) {
                     mostrarErrores(form, datos.errores || {});
+
                     EC.mostrarMensaje(
                         'error',
-                        datos.mensaje || 'No fue posible registrar la calificación.'
+                        datos.mensaje || 'No fue posible guardar la calificación.'
                     );
+
                     boton.disabled = false;
                     return;
                 }
 
                 EC.guardarFlash('ok', datos.mensaje);
+
                 EC.irA('calificaciones/index.html');
             })
             .catch(function (error) {
-                console.error('Error al registrar calificación:', error);
+                console.error('Error al guardar calificación:', error);
 
                 EC.mostrarMensaje(
                     'error',
@@ -94,6 +105,22 @@
             });
     }
 
+    function cargarCalificacion(form, id) {
+        return EC.datos.calificacionesDetalle().then(function (lista) {
+            var calificacion = lista.find(function (c) {
+                return Number(c.id) === id;
+            });
+
+            if (!calificacion) {
+                throw new Error('No se encontró la calificación que deseas editar.');
+            }
+
+            form.elements.estudiante_id.value = calificacion.estudiante_id;
+            form.elements.materia_id.value = calificacion.materia_id;
+            form.elements.nota.value = calificacion.nota;
+        });
+    }
+
     EC.alCargar(function () {
         var form = document.getElementById('form-calificacion');
         var modo = document.body.dataset.modo;
@@ -102,7 +129,18 @@
             return;
         }
 
+        var parametros = new URLSearchParams(window.location.search);
+        var id = Number(parametros.get('id'));
+
         form.hidden = true;
+
+        if (modo === 'editar' && (!Number.isInteger(id) || id < 1)) {
+            EC.mostrarMensaje(
+                'error',
+                'El identificador de la calificación no es válido.'
+            );
+            return;
+        }
 
         cargarDesplegables(form)
             .then(function () {
@@ -111,14 +149,19 @@
                 form.elements.nota.min = rango.notaMinima;
                 form.elements.nota.max = rango.notaMaxima;
 
+                if (modo === 'editar') {
+                    return cargarCalificacion(form, id);
+                }
+            })
+            .then(function () {
                 form.hidden = false;
             })
             .catch(function (error) {
-                console.error('Error al cargar estudiantes y materias:', error);
+                console.error('Error al cargar el formulario:', error);
 
                 EC.mostrarMensaje(
                     'error',
-                    'No se pudieron cargar los estudiantes y las materias desde MySQL.'
+                    error.message || 'No se pudieron cargar los datos del formulario.'
                 );
             });
 
@@ -131,15 +174,11 @@
                 nota: form.elements.nota.value
             };
 
-            if (modo === 'registrar') {
-                registrarMySQL(form, valores);
-                return;
+            if (modo === 'editar') {
+                valores.id = id;
             }
 
-            EC.mostrarMensaje(
-                'error',
-                'La edición de calificaciones todavía no está conectada a MySQL.'
-            );
+            enviarMySQL(form, valores, modo);
         });
     });
 })();
