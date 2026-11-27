@@ -10,13 +10,13 @@
     var permitido = false;
 
     var MENU = [
-        { texto: 'pagina principal', icono: '🏠', ruta: 'index.html', seccion: 'pagina principal' },
-        { texto: 'Estudiantes', icono: '👨‍🎓', ruta: 'estudiantes/index.html', seccion: 'estudiantes' },
-        { texto: 'Calificaciones', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'calificaciones' },
-        { texto: 'Estadísticas', icono: '📊', ruta: 'estadisticas/index.html', seccion: 'estadisticas' },
-        { texto: 'Reportes', icono: '📄', ruta: 'reportes/index.html', seccion: 'reportes' },
-        { texto: 'Respaldo', icono: '💾', ruta: 'respaldo/index.html', seccion: 'respaldo' },
-        { texto: 'Configuración', icono: '⚙️', ruta: 'configuracion/index.html', seccion: 'configuracion' }
+        { texto: 'Página Principal', icono: '🏠', ruta: 'index.html', seccion: 'Página Principal' },
+        { texto: 'Estudiantes', icono: '👨‍🎓', ruta: 'estudiantes/index.html', seccion: 'Estudiantes' },
+        { texto: 'Calificaciones', icono: '📚', ruta: 'calificaciones/index.html', seccion: 'Calificaciones' },
+        { texto: 'Estadísticas', icono: '📊', ruta: 'estadisticas/index.html', seccion: 'Estadísticas' },
+        { texto: 'Reportes', icono: '📄', ruta: 'reportes/index.html', seccion: 'Reportes' },
+        { texto: 'Respaldo', icono: '💾', ruta: 'respaldo/index.html', seccion: 'Respaldo' },
+        { texto: 'Configuración', icono: '⚙️', ruta: 'configuracion/index.html', seccion: 'Configuración' }
     ];
 
     EC.alCargar = function (fn) {
