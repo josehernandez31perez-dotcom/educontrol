@@ -45,28 +45,25 @@
 
             if (errorCarga) {
                 contador.textContent = 'Estudiantes registrados: no disponible';
-
                 zona.innerHTML =
                     '<div class="alerta alerta-error" role="alert">' +
                     EC.esc(textoError) +
                     '</div>' +
                     '<button type="button" class="btn btn-secundario" id="btn-reintentar">Reintentar</button>';
-
                 return;
             }
 
             var termino = buscador.value.trim();
             var lista = filtrar(termino);
 
-            contador.textContent =
-                'Estudiantes registrados: ' + lista.length +
-                (termino ? ' (búsqueda)' : '');
+            contador.textContent = 'Estudiantes registrados: ' +
+                lista.length + (termino ? ' (búsqueda)' : '');
 
             if (!lista.length) {
                 zona.innerHTML = termino
-                    ? '<p class="vacio">No se encontraron estudiantes para «' + EC.esc(termino) + '».</p>'
+                    ? '<p class="vacio">No se encontraron estudiantes para «' +
+                        EC.esc(termino) + '».</p>'
                     : '<p class="vacio">Todavía no hay estudiantes registrados.</p>';
-
                 return;
             }
 
@@ -115,24 +112,22 @@
             errorCarga = false;
             pintar();
 
-            return EC.datos.estudiantes()
-                .then(function (lista) {
-                    estudiantes = lista;
-                    errorCarga = false;
-                }, function (error) {
-                    if (error && error.sesionCaducada) {
-                        return;
-                    }
+            return EC.datos.estudiantes().then(function (lista) {
+                estudiantes = lista;
+                errorCarga = false;
+            }, function (error) {
+                if (error && error.sesionCaducada) {
+                    return;
+                }
 
-                    estudiantes = [];
-                    errorCarga = true;
-                    textoError = EC.mensajeDeError(error);
-                    EC.mostrarMensaje('error', textoError);
-                })
-                .then(function () {
-                    cargando = false;
-                    pintar();
-                });
+                estudiantes = [];
+                errorCarga = true;
+                textoError = EC.mensajeDeError(error);
+                EC.mostrarMensaje('error', textoError);
+            }).then(function () {
+                cargando = false;
+                pintar();
+            });
         }
 
         buscador.addEventListener('input', pintar);
@@ -143,22 +138,31 @@
                 return;
             }
 
-            var botonEditar = evento.target.closest('.btn-editar');
+            var botonVer = evento.target.closest('.btn-ver');
 
-            if (botonEditar) {
-                var id = Number(botonEditar.dataset.id);
+            if (botonVer) {
+                var idVer = Number(botonVer.dataset.id);
 
-                if (id > 0) {
-                    EC.irA('estudiantes/editar.html?id=' + id);
+                if (idVer > 0) {
+                    EC.irA('estudiantes/ver.html?id=' + idVer);
                 }
-
                 return;
             }
 
-            if (
-                evento.target.closest('.btn-ver') ||
-                evento.target.closest('.btn-eliminar')
-            ) {
+            var botonEditar = evento.target.closest('.btn-editar');
+
+            if (botonEditar) {
+                var idEditar = Number(botonEditar.dataset.id);
+
+                if (idEditar > 0) {
+                    EC.irA('estudiantes/editar.html?id=' + idEditar);
+                }
+                return;
+            }
+
+            var botonEliminar = evento.target.closest('.btn-eliminar');
+
+            if (botonEliminar) {
                 EC.mostrarMensaje('info', mensajePendiente());
             }
         });
