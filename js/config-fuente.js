@@ -8,7 +8,7 @@
 
     var EC = global.EC = global.EC || {};
 
-    var FUENTE_ACTUAL = 'local';
+    var FUENTE_ACTUAL = 'mysql';
     var FUENTES_VALIDAS = ['local', 'mysql'];
 
     Object.defineProperty(EC, 'fuente', {
