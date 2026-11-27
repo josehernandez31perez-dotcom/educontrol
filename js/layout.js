@@ -227,21 +227,27 @@
 
             // Permitir la edición de estudiantes conectada a MySQL.
             // Las demás páginas de escritura siguen bloqueadas.
-            // Permitir la edición de estudiantes y el registro de calificaciones en MySQL.
+            // Permitir el registro y edición de estudiantes y el registro de calificaciones.
             var esEdicionEstudiante =
-                body.dataset.seccion === 'estudiantes' &&
-                body.dataset.modo === 'editar';
+            body.dataset.seccion === 'estudiantes' &&
+            body.dataset.modo === 'editar';
+
+            var esRegistroEstudiante =
+            body.dataset.seccion === 'estudiantes' &&
+            body.dataset.modo === 'registrar';
 
             var esRegistroCalificacion =
-                body.dataset.seccion === 'calificaciones' &&
-                body.dataset.modo === 'registrar';
+            body.dataset.seccion === 'calificaciones' &&
+            body.dataset.modo === 'registrar';
 
             if (
                 EC.fuente === 'mysql' &&
                 body.dataset.escritura === 'true' &&
                 !esEdicionEstudiante &&
+                !esRegistroEstudiante &&
                 !esRegistroCalificacion
             ) {
+
                 var zonaBloqueada = document.getElementById('contenido-pagina');
 
                 if (zonaBloqueada) {
