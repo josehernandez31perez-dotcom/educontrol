@@ -7,7 +7,11 @@
 
     EC.alCargar(function () {
         var esAdmin = EC.auth.sesion().rol === 'ADMIN';
-        var puedeModificar = esAdmin && EC.fuente !== 'mysql';
+
+        // Los administradores pueden editar tanto en MySQL como en local.
+        // La eliminación en MySQL permanece desactivada por ahora.
+        var puedeEditar = esAdmin;
+        var puedeEliminar = esAdmin && EC.fuente !== 'mysql';
 
         var params = new URLSearchParams(window.location.search);
         var seleccionado = Number(params.get('estudiante_id')) || 0;
@@ -64,10 +68,14 @@
                     '<button type="button" class="btn btn-pequeno btn-secundario btn-ver" data-id="' +
                     c.id + '">Ver</button>';
 
-                if (puedeModificar) {
+                if (puedeEditar) {
                     acciones +=
                         ' <a class="btn btn-pequeno btn-secundario" href="editar.html?id=' +
-                        c.id + '">Editar</a>' +
+                        encodeURIComponent(c.id) + '">Editar</a>';
+                }
+
+                if (puedeEliminar) {
+                    acciones +=
                         ' <button type="button" class="btn btn-pequeno btn-peligro btn-eliminar" data-id="' +
                         c.id + '" data-texto="' +
                         EC.esc(c.materia + ' de ' + c.nombre + ' ' + c.apellido) +
@@ -129,7 +137,8 @@
                 EC.esc(calificacion.nombre + ' ' + calificacion.apellido) + '</p>' +
                 '<p><strong>Cédula:</strong> ' + EC.esc(calificacion.cedula) + '</p>' +
                 '<p><strong>Materia:</strong> ' + EC.esc(calificacion.materia) + '</p>' +
-                '<p><strong>Nota:</strong> ' + EC.esc(EC.formato.nota(calificacion.nota)) + '</p>' +
+                '<p><strong>Nota:</strong> ' +
+                EC.esc(EC.formato.nota(calificacion.nota)) + '</p>' +
                 '<p><strong>Fecha de registro:</strong> ' +
                 EC.esc(EC.fecha(calificacion.fecha_registro)) + '</p>';
 
@@ -164,7 +173,7 @@
 
             var boton = evento.target.closest('.btn-eliminar');
 
-            if (!boton || !puedeModificar) {
+            if (!boton || !puedeEliminar) {
                 return;
             }
 
